@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "633473829957",
+    "project_id": "list-to-do-tasks",
+    "storage_bucket": "list-to-do-tasks.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633473829957:android:f2503e707bbd9e89f8272c",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnbWoX3at3lfIyEqui2eamQeblJ8QFST4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,109 @@
+<header class="app-header">
+  <div class="logo">
+    <img src="assets/public/logo.png" alt="Logo de la aplicación">
+  </div>
+  <nav class="header-nav"> 
+  </nav>
+  <div *ngIf="botonhabitos  == 'true'"><button [routerLink]="['/habits']" class="habits-button">Mis Hábitos</button></div>
+
+</header>
+
+
+<div class="actions-bar">
+  <button class="add-category-button" (click)="openAddCategoryModal()">Agregar Categoría</button>
+  <button class="edit-category-button" (click)="openEditCategoryModal()">Editar Categorías</button>
+  <button class="delete-button" (click)="deleteCompletedTasks()">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="trash-icon">
+      <path fill-rule="evenodd"
+        d="M16.5 5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM18.333 7.5h-12.666L4.5 9.75h15L18.333 7.5ZM7.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm5.25 1.5a.75.75 0 0 0-1.5 0v3a.75.75 0 0 0 1.5 0v-3ZM16.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm-9-1.5a.75.75 0 0 0-.75-.75v4.5a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75ZM18 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm-3-3a.75.75 0 0 0-.75-.75v6a.75.75 0 0 0 1.5 0v-6a.75.75 0 0 0-.75-.75ZM9 9.75h6.75v9H9v-9Z"
+        clip-rule="evenodd" />
+    </svg>
+  </button>
+</div>
+
+
+
+
+<div class="filter-bar">
+  <div class="filter-container">
+    <button class="all-categories-button" [class.active]="selectedCategory === 'Todos'" (click)="selectCategory('Todos')">
+      Todas
+    </button>
+    <select class="category-select" (change)="selectCategory($any($event.target).value)">
+      <option value="" disabled>Filtrar por Categoría</option>
+      <option *ngFor="let category of categories$ | async" [value]="category" [selected]="selectedCategory === category">{{ category }}</option>
+    </select>
+  </div>
+</div>
+
+<h2>Mis tareas</h2>
+<div class="tasks-list">
+  <div *ngFor="let task of filteredTasks$ | async" class="task-item">
+    <span class="task-indicator" [style.backgroundColor]="getIndicatorColor(task.category)"></span>
+    <div class="task-content">
+      {{ task.name }}
+      <div class="task-category">{{ task.category }}</div>
+      <div class="task-date">{{ task.date | date: 'dd/MM/yyyy' }}</div>
+    </div>
+    <label class="checkout-label">
+      <input type="checkbox" class="checkout-input" [checked]="task.completed" (change)="toggleComplete(task)">
+      <span class="checkmark">{{ task.completed ? '✓' : '' }}</span>
+    </label>
+  </div>
+</div>
+
+<button class="add-task-button" (click)="openAddTaskModal()">+</button>
+
+<div *ngIf="showAddTaskModal" class="modal">
+  <div class="modal-content">
+    <h2>Nueva Tarea</h2>
+    <div class="input-container">
+      <input type="text" id="task_name" placeholder="Tarea" [(ngModel)]="newTask.name">
+    </div>
+    <div class="input-container">
+      <select id="task_category" [(ngModel)]="newTask.category">
+        <option value="" disabled selected>Seleccionar Categoría</option>
+        <option *ngFor="let category of categories$ | async" [value]="category">{{ category }}</option>
+      </select>
+    </div>
+    <div class="input-container">
+      <input type="date" id="task_date" [(ngModel)]="newTask.date">
+    </div>
+    <div class="modal-actions">
+      <button class="cancel-button" (click)="closeAddTaskModal()">Cancelar</button>
+      <button class="save-button" (click)="addTask()">Guardar Tarea</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showAddCategoryModal" class="modal">
+  <div class="modal-content">
+    <h2>Agregar Categoría</h2>
+    <div class="input-container">
+      <input type="text" id="category_name" placeholder="Nombre de la categoría" [(ngModel)]="newCategoryName">
+    </div>
+    <div class="modal-actions">
+      <button class="cancel-button" (click)="closeAddCategoryModal()">Cancelar</button>
+      <button class="save-button" (click)="addCategory()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showEditCategoryModal" class="modal">
+  <div class="modal-content">
+    <h2>Editar Categorías</h2>
+    <ul class="edit-categories-list">
+      <li *ngFor="let category of categories$ | async">
+        {{ category }}
+        <button class="delete-category-inline-button" (click)="deleteCategory(category)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="delete-icon-inline">
+            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75-4.365-9.75-9.75-9.75ZM8.53 7.47a.75.75 0 0 0-1.06 1.06L10.94 12l-3.47 3.47a.75.75 0 1 0 1.06 1.06L12 13.06l3.47 3.47a.75.75 0 1 0 1.06-1.06L13.06 12l3.47-3.47a.75.75 0 0 0-1.06-1.06L12 10.94l-3.47-3.47Z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </li>
+    </ul>
+    <div class="modal-actions">
+      <button class="cancel-button" (click)="closeEditCategoryModal()">Cerrar</button>
+    </div>
+  </div>
+</div>

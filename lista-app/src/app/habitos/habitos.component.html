@@ -1,0 +1,98 @@
+<ion-header class="app-header">
+  <ion-toolbar>
+    <ion-title>Mis Hábitos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <div class="add-habit-section">
+      <ion-item>
+        <ion-input label="Nuevo Hábito" type="text" [(ngModel)]="newHabitName"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Duración</ion-label>
+        <ion-select [(ngModel)]="newHabitDuration">
+          <ion-select-option value="5">5 días</ion-select-option>
+          <ion-select-option value="7">1 semana</ion-select-option>
+          <ion-select-option value="15">15 días</ion-select-option>
+          <ion-select-option value="30">1 mes</ion-select-option>
+          <ion-select-option value="60">2 meses</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-button slot="end" (click)="addHabit()">Agregar</ion-button>
+    </div>
+
+    <ion-list *ngIf="habits$ | async as habits">
+      <ion-item-sliding *ngFor="let habit of habits; trackBy: trackByHabitId">
+        <ion-item>
+          <ion-label>
+            <h2>{{ habit.name }}</h2>
+            <p>Inicio: {{ habit.startDate | date }}</p>
+            <p>Fin: {{ habit.endDate | date }} ({{ habit.durationDays }} días)</p>
+            <div class="habit-completion">
+              <span class="day-label">Día</span>
+              <ng-container
+                *ngFor="
+                  let day of getDaysForDuration(
+                    habit.startDate,
+                    habit.durationDays
+                  );
+                  trackBy: trackByDay
+                "
+              >
+                <span class="day-checkbox">
+                  <ion-checkbox
+                    [checked]="habit.completion[day]"
+                    (ionChange)="toggleCompletion(habit.id, day)"
+                  ></ion-checkbox>
+                  <span class="date-indicator">{{ day.split("-")[2] }}</span>
+                </span>
+              </ng-container>
+            </div>
+          </ion-label>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="warning" (click)="startEditHabit(habit)"
+            >Editar</ion-item-option
+          >
+          <ion-item-option color="danger" (click)="deleteHabit(habit.id)"
+            >Eliminar</ion-item-option
+          >
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+
+    <div *ngIf="habits$ | async as habits">
+      <div *ngIf="habits.length === 0" class="empty-message">
+        <p>Aún no has agregado ningún hábito. ¡Empieza ahora!</p>
+      </div>
+    </div>
+
+    <ion-modal [isOpen]="editingHabit !== null">
+      <ng-template>
+        <ion-content class="modal-content">
+          <h2>Editar Hábito</h2>
+          <ion-item>
+            <ion-input
+              label="Nombre del Hábito"
+              type="text"
+              [(ngModel)]="editedHabitName"
+            ></ion-input>
+          </ion-item>
+          <div class="modal-actions">
+            <ion-button (click)="cancelEditHabit()">Cancelar</ion-button>
+            <ion-button
+              color="primary"
+              (click)="saveEditedHabit()"
+              [disabled]="!editedHabitName.trim()"
+              >Guardar</ion-button
+            >
+          </div>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </div>
+</ion-content>
+
+
